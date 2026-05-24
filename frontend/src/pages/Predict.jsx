@@ -5,7 +5,7 @@ import StructureViewer3D from '../components/StructureViewer3D';
 
 const API_BASE_URL = import.meta.env.DEV
   ? (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000')
-  : (import.meta.env.VITE_API_BASE_URL || 'https://fantasy-casually-hatching.ngrok-free.dev/tox');
+  : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000');
 
 const INITIAL_MOCK_PREDICTIONS = {
   "NR-AhR": { "is_active": false, "probability": 0.096, "optimal_threshold": 0.85 },
@@ -126,27 +126,27 @@ export default function Predict() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-12 py-8 flex-1">
-      <div className="space-y-6">
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8 flex-1">
+      <div className="space-y-4 sm:space-y-6">
         {/* Alert Notice if in Sandbox mode */}
         {usingMock && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-850 text-xs px-6 py-3 rounded-lg flex items-center justify-between shadow-sm">
-            <div className="flex items-center gap-2">
+          <div className="bg-amber-50 border border-amber-200 text-amber-850 text-xs px-4 sm:px-6 py-3 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-sm">
+            <div className="flex items-start sm:items-center gap-2">
               <AlertCircle className="w-4 h-4 text-amber-600" />
               <span>Backend offline. Running in Simulated Sandbox Mode with local consensus models.</span>
             </div>
-            <button onClick={() => handlePredict()} className="underline font-semibold hover:text-amber-900 ml-4">
+            <button onClick={() => handlePredict()} className="underline font-semibold hover:text-amber-900 sm:ml-4 self-start sm:self-auto">
               Retry Connection
             </button>
           </div>
         )}
 
         {/* SMILES Input Section */}
-        <section className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm">
+        <section className="bg-white border border-slate-200 p-4 sm:p-5 rounded-xl shadow-sm">
           <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 font-mono">
             SMILES Input Query
           </label>
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 bg-slate-50 px-4 py-3 rounded border border-slate-200 focus-within:border-indigo-600 focus-within:bg-white focus-within:ring-1 focus-within:ring-indigo-600 transition-all">
               <textarea
                 value={smilesQuery}
@@ -159,13 +159,13 @@ export default function Predict() {
             <button
               onClick={() => handlePredict()}
               disabled={isPredicting}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 font-semibold flex items-center justify-center gap-2 rounded-lg hover:shadow-md active:scale-95 disabled:opacity-50 transition-all"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 font-semibold flex items-center justify-center gap-2 rounded-lg hover:shadow-md active:scale-95 disabled:opacity-50 transition-all w-full lg:w-auto"
             >
               <Bolt className={`w-5 h-5 ${isPredicting ? 'animate-spin' : ''}`} />
               <span>{isPredicting ? 'Calculating...' : 'Predict Toxicity'}</span>
             </button>
           </div>
-          <div className="flex gap-2.5 mt-3 text-[10px] items-center">
+          <div className="flex flex-wrap gap-2.5 mt-3 text-[10px] items-center">
             <span className="text-slate-400">Presets:</span>
             <button onClick={() => { setSmilesQuery('CC(=O)OC1=CC=CC=C1C(=O)O'); handlePredict('CC(=O)OC1=CC=CC=C1C(=O)O'); }} className="text-indigo-650 hover:underline font-mono font-medium">Aspirin</button>
             <button onClick={() => { setSmilesQuery('CN1C=NC2=C1C(=O)N(C(=O)N2C)C'); handlePredict('CN1C=NC2=C1C(=O)N(C(=O)N2C)C'); }} className="text-indigo-650 hover:underline font-mono font-medium">Caffeine</button>
@@ -175,14 +175,14 @@ export default function Predict() {
         </section>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-12 gap-4 lg:gap-6 items-start">
           {/* Left Column: Structure Visualizer */}
           <div className="col-span-12 lg:col-span-4 lg:sticky lg:top-20">
-            <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm space-y-4">
-              <div className="flex justify-between items-center">
+            <div className="bg-white border border-slate-200 p-4 sm:p-5 rounded-xl shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <h2 className="text-sm font-bold text-slate-900">Molecule Anatomy</h2>
                 {/* Tab Selector */}
-                <div className="flex border border-slate-250 bg-slate-50 rounded overflow-hidden text-[10px] font-mono">
+                <div className="flex w-fit border border-slate-250 bg-slate-50 rounded overflow-hidden text-[10px] font-mono">
                   <button
                     onClick={() => setStructureTab('2d')}
                     className={`px-3 py-1.5 transition-colors ${
@@ -203,7 +203,7 @@ export default function Predict() {
               </div>
 
               {/* Renderer Panel */}
-              <div className="aspect-square bg-white border border-slate-200 flex items-center justify-center rounded-lg overflow-hidden relative">
+              <div className="aspect-square bg-white border border-slate-200 flex items-center justify-center rounded-lg overflow-hidden relative min-h-[280px] sm:min-h-[320px]">
                 {structureTab === '2d' ? (
                   <div className="w-full h-full flex items-center justify-center p-4 bg-slate-50/50" dangerouslySetInnerHTML={{ __html: structureSvg }} />
                 ) : (
@@ -235,7 +235,7 @@ export default function Predict() {
           <div className="col-span-12 lg:col-span-8 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-slate-900">Consensus Inference Outcomes</h2>
-              <div className="flex gap-4 text-xs font-mono text-slate-500">
+              <div className="hidden sm:flex gap-4 text-xs font-mono text-slate-500">
                 <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-red-500"></span> Active</span>
                 <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-slate-400"></span> Inactive</span>
               </div>

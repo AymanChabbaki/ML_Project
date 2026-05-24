@@ -12,7 +12,7 @@ export default function App() {
     <Router>
       <div className="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-900">
         <Navbar />
-        <main className="flex-1 w-full flex flex-col">
+        <main className="flex-1 w-full flex flex-col pb-28 lg:pb-0">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/predict" element={<Predict />} />

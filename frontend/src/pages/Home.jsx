@@ -65,7 +65,7 @@ fetchPredictions("CC(=O)OC1=CC=CC=C1C(=O)O").then(console.log);`
       <img src="/molecular_roots.png" alt="Molecular Roots Right" className="absolute right-[-100px] top-[550px] w-[500px] md:w-[700px] lg:w-[900px] opacity-[0.09] pointer-events-none z-0 select-none" />
       <img src="/molecular_roots.png" alt="Molecular Roots Left" className="absolute left-[-200px] top-[1300px] w-[500px] md:w-[700px] lg:w-[800px] opacity-[0.09] pointer-events-none z-0 select-none scale-x-[-1]" />
       {/* Hero Section with Video Background */}
-      <section className="relative w-full min-h-[calc(100vh-4rem)] flex items-center justify-center px-12 py-16 overflow-hidden">
+      <section className="relative w-full min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 sm:px-6 lg:px-12 py-10 sm:py-12 lg:py-16 overflow-hidden">
         {/* Background Video */}
         <video 
           autoPlay 
@@ -79,33 +79,33 @@ fetchPredictions("CC(=O)OC1=CC=CC=C1C(=O)O").then(console.log);`
         </video>
         
         {/* Soft Premium Light Overlay (low opacity to let the video shine clearly) */}
-        <div className="absolute inset-0 bg-white/5 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/5 to-slate-50/20 z-10" />
 
         {/* Content Wrapper */}
-        <div className="relative max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center z-20">
-          <div className="space-y-6 bg-white/70 backdrop-blur-md p-8 lg:p-10 rounded-2xl border border-slate-250/80 shadow-lg">
-            <span className="px-3.5 py-1 bg-indigo-50 text-indigo-750 text-xs font-mono font-bold rounded-full border border-indigo-100 flex items-center gap-1.5 w-fit shadow-sm">
+        <div className="relative max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center z-20">
+          <div className="space-y-5 sm:space-y-6 bg-white/78 backdrop-blur-md p-5 sm:p-7 lg:p-10 rounded-2xl border border-slate-250/80 shadow-lg text-center lg:text-left">
+            <span className="px-3.5 py-1 bg-indigo-50 text-indigo-750 text-[10px] sm:text-xs font-mono font-bold rounded-full border border-indigo-100 flex items-center gap-1.5 w-fit shadow-sm mx-auto lg:mx-0">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse"></span>
               Tox21 High-Throughput Screening Portal
             </span>
-            <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
               Consensus ML <br />
               <span className="text-indigo-650">Toxicity Prediction</span>
             </h1>
-            <p className="text-slate-650 text-base leading-relaxed max-w-lg">
+            <p className="text-slate-650 text-sm sm:text-base leading-relaxed max-w-lg mx-auto lg:mx-0">
               Evaluate chemical compounds across 12 critical biological endpoints targeting nuclear receptor activations and stress response pathways. Serves robust, consensus machine learning predictions using Morgan fingerprints and optimized thresholds.
             </p>
-            <div className="flex items-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2 max-w-xl mx-auto lg:mx-0">
               <button
                 onClick={() => navigate('/predict')}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 font-bold rounded-xl transition-all flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95 hover:scale-[1.01]"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 sm:px-6 py-3.5 sm:py-4 font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95 hover:scale-[1.01] w-full sm:w-auto"
               >
                 <span>Launch Predictor</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => navigate('/docs')}
-                className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-6 py-4 font-bold rounded-xl transition-all shadow-sm active:scale-95"
+                className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-5 sm:px-6 py-3.5 sm:py-4 font-bold rounded-xl transition-all shadow-sm active:scale-95 w-full sm:w-auto"
               >
                 Methodology Docs
               </button>
@@ -113,15 +113,15 @@ fetchPredictions("CC(=O)OC1=CC=CC=C1C(=O)O").then(console.log);`
           </div>
           
           {/* Interactive 3D Hero Structure */}
-          <div className="w-full max-w-md mx-auto lg:ml-auto flex flex-col gap-2">
-            <div className="aspect-square w-full rounded-2xl overflow-hidden border border-slate-200 shadow-xl relative group bg-white p-2">
-              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm border border-slate-200/80 px-2.5 py-1 rounded-lg text-[10px] font-mono text-slate-600 z-10 shadow-sm flex items-center gap-1.5">
+          <div className="w-full max-w-sm sm:max-w-md mx-auto lg:ml-auto flex flex-col gap-2">
+            <div className="aspect-square w-full rounded-2xl overflow-hidden border border-slate-200 shadow-xl relative group bg-white p-2 sm:p-3">
+              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-white/90 backdrop-blur-sm border border-slate-200/80 px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-mono text-slate-600 z-10 shadow-sm flex items-center gap-1.5 max-w-[calc(100%-1.5rem)] sm:max-w-none">
                 <FlaskConical className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
-                <span>Interactive 3D Preview (Caffeine)</span>
+                <span className="truncate">Interactive 3D Preview (Caffeine)</span>
               </div>
               <StructureViewer3D smiles="CN1C=NC2=C1C(=O)N(C(=O)N2C)C" />
             </div>
-            <span className="text-[10px] text-center text-slate-500 font-mono">
+            <span className="text-[10px] text-center text-slate-500 font-mono px-2">
               Drag to rotate • Scroll to zoom 
             </span>
           </div>
@@ -129,10 +129,10 @@ fetchPredictions("CC(=O)OC1=CC=CC=C1C(=O)O").then(console.log);`
       </section>
 
       {/* Trust & Integrations Banner */}
-      <section className="w-full bg-slate-50 border-y border-slate-200/80 py-8 px-12 z-20">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <section className="w-full bg-slate-50 border-y border-slate-200/80 py-7 sm:py-8 px-4 sm:px-6 lg:px-12 z-20">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 text-center md:text-left">
           <span className="text-xs font-bold text-slate-450 uppercase tracking-widest font-mono">Screening Standards</span>
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 text-sm font-semibold text-slate-400 font-mono">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-12 text-xs sm:text-sm font-semibold text-slate-400 font-mono">
             <span className="hover:text-slate-650 transition-colors">Tox21 Consortium</span>
             <span className="hover:text-slate-650 transition-colors">NIH / NCATS</span>
             <span className="hover:text-slate-650 transition-colors">US EPA</span>
@@ -143,10 +143,10 @@ fetchPredictions("CC(=O)OC1=CC=CC=C1C(=O)O").then(console.log);`
       </section>
 
       {/* Bento Grid Features Section */}
-      <section className="w-full max-w-7xl px-12 py-20 space-y-12">
+      <section className="w-full max-w-7xl px-4 sm:px-6 lg:px-12 py-16 sm:py-20 space-y-10 sm:space-y-12">
         <div className="text-center max-w-xl mx-auto space-y-2">
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Consensus Pipeline Architecture</h2>
-          <p className="text-xs text-slate-500">Advanced featurization, double-stage reduction, and optimized decision logic.</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Consensus Pipeline Architecture</h2>
+          <p className="text-xs sm:text-sm text-slate-500">Advanced featurization, double-stage reduction, and optimized decision logic.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -190,7 +190,7 @@ fetchPredictions("CC(=O)OC1=CC=CC=C1C(=O)O").then(console.log);`
       </section>
 
       {/* High-Throughput Consensus Diagnostics Section */}
-      <section className="w-full max-w-7xl px-12 py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center z-10">
+      <section className="w-full max-w-7xl px-4 sm:px-6 lg:px-12 py-16 sm:py-20 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center z-10">
         <div className="lg:col-span-6 rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-white p-3">
           <img src="/tox21_diagnostic.png" alt="Toxicity Screening Diagnostic" className="w-full h-auto rounded-xl object-cover hover:scale-[1.01] transition-transform" />
         </div>
@@ -199,14 +199,14 @@ fetchPredictions("CC(=O)OC1=CC=CC=C1C(=O)O").then(console.log);`
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             High-Throughput Assay Screens
           </span>
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
             High-Throughput Consensus <br />
             <span className="text-indigo-650">Toxicity Diagnostics</span>
           </h2>
-          <p className="text-slate-650 text-sm leading-relaxed">
+          <p className="text-slate-650 text-sm sm:text-base leading-relaxed">
             Consensus machine learning models map circular Morgan ECFP4 descriptors against target biological pathways. By identifying key toxicophores and molecular structures, the system alerts researchers to potential endocrine disruptions and cellular stressors.
           </p>
-          <div className="grid grid-cols-2 gap-4 text-xs font-mono text-slate-500">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono text-slate-500">
             <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
               <span className="block text-[10px] uppercase font-bold text-indigo-650 mb-1">Accuracy Benchmark</span>
               <span className="font-semibold text-slate-800 text-sm">0.824 mean ROC-AUC</span>

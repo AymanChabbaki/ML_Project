@@ -115,16 +115,19 @@ class Tox21Predictor:
         return PredictionResponse(results=results)
 
     def get_structure_svg(self, smiles: str) -> str:
-        from rdkit.Chem.Draw import rdMolDraw2D
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return ""
         try:
+            from rdkit.Chem.Draw import rdMolDraw2D
             Chem.rdDepictor.Compute2DCoords(mol)
             drawer = rdMolDraw2D.MolDraw2DSVG(350, 350)
             drawer.DrawMolecule(mol)
             drawer.FinishDrawing()
             return drawer.GetDrawingText()
+        except ImportError as e:
+            print(f"Error importing RDKit drawing backend for {smiles}: {e}")
+            return ""
         except Exception as e:
             print(f"Error drawing molecule {smiles}: {e}")
             return ""

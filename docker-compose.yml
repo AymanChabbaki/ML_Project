@@ -5,6 +5,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    environment:
+      TOX21_MODELS_DIR: /app/tox21_production_models
     ports:
       - "8010:8000"
     volumes:

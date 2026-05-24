@@ -8,10 +8,30 @@ from typing import List
 from .schemas import PredictionResponse, MoleculePredictionResponse, EndpointPrediction
 
 class Tox21Predictor:
-    def __init__(self, models_dir: str = "../tox21_production_models"):
-        self.models_dir = models_dir
+    def __init__(self, models_dir: str = None):
+        self.models_dir = self._resolve_models_dir(models_dir)
         self.endpoints = {}
         self.load_models()
+
+    def _resolve_models_dir(self, models_dir: str = None) -> str:
+        if models_dir:
+            return os.path.abspath(models_dir)
+
+        env_models_dir = os.getenv("TOX21_MODELS_DIR") or os.getenv("MODELS_DIR")
+        if env_models_dir:
+            return os.path.abspath(env_models_dir)
+
+        candidates = [
+            "/app/tox21_production_models",
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "tox21_production_models")),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tox21_production_models")),
+        ]
+
+        for candidate in candidates:
+            if os.path.exists(candidate):
+                return candidate
+
+        return candidates[0]
 
     def load_models(self):
         if not os.path.exists(self.models_dir):
@@ -124,4 +144,4 @@ class Tox21Predictor:
             return ""
 
 # Initialize a global predictor instance
-predictor = Tox21Predictor(models_dir=os.path.join(os.path.dirname(__file__), "../../tox21_production_models"))
+predictor = Tox21Predictor()

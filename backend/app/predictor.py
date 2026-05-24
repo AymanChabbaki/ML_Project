@@ -4,8 +4,11 @@ import numpy as np
 import warnings
 from rdkit import Chem
 from rdkit.Chem import AllChem
+from rdkit.Chem import rdFingerprintGenerator
 from typing import List
 from .schemas import PredictionResponse, MoleculePredictionResponse, EndpointPrediction
+
+MORGAN_GENERATOR = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=1024)
 
 class Tox21Predictor:
     def __init__(self, models_dir: str = None):
@@ -56,7 +59,7 @@ class Tox21Predictor:
         if mol is None:
             return None
         # Use Morgan fingerprint as used in training: radius 2, 1024 bits
-        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)
+        fp = MORGAN_GENERATOR.GetFingerprint(mol)
         arr = np.zeros((0,), dtype=np.int8)
         Chem.DataStructs.ConvertToNumpyArray(fp, arr)
         return arr.reshape(1, -1)

@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException, Response
+import os
+
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from .schemas import PredictionRequest, PredictionResponse
 from .predictor import predictor
@@ -9,14 +11,31 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow CORS for potential frontend integrations
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ALLOW_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,https://toxpredictor.techermanos.org",
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def _cors_response(content: str, media_type: str, request: Request) -> Response:
+    headers = {}
+    origin = request.headers.get("origin")
+    if origin in ALLOWED_ORIGINS:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Vary"] = "Origin"
+    return Response(content=content, media_type=media_type, headers=headers)
 
 @app.get("/health", tags=["Health"])
 def health_check():
@@ -35,18 +54,18 @@ def predict(request: PredictionRequest):
     return response
 
 @app.get("/structure", tags=["Visualization"])
-def get_structure(smiles: str):
+def get_structure(smiles: str, request: Request):
     svg_content = predictor.get_structure_svg(smiles)
     if not svg_content:
         raise HTTPException(status_code=400, detail="Invalid SMILES string or drawing error.")
-    return Response(content=svg_content, media_type="image/svg+xml")
+    return _cors_response(svg_content, "image/svg+xml", request)
 
 @app.get("/structure3d", tags=["Visualization"])
-def get_structure_3d(smiles: str):
+def get_structure_3d(smiles: str, request: Request):
     mol_block = predictor.get_structure_3d(smiles)
     if not mol_block:
         raise HTTPException(status_code=400, detail="Invalid SMILES string or embedding error.")
-    return Response(content=mol_block, media_type="text/plain")
+    return _cors_response(mol_block, "text/plain", request)
 
 # To run locally: uvicorn app.main:app --reload
 

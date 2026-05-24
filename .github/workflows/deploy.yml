@@ -20,7 +20,7 @@ jobs:
           port: 22
           script: |
             # Navigate to the project root on the VPS
-            cd /var/www/tox21
+            cd /home/ultex/ML_Project
             # Pull latest changes from git
             git pull origin main
             # Restart containers with the new build

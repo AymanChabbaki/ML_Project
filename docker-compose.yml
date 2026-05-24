@@ -6,7 +6,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8090:8090"
+      - "8010:8000"
     volumes:
       - ./tox21_production_models:/app/tox21_production_models
     restart: always

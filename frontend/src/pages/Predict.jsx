@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Bolt, ZoomIn, Sliders, Terminal, AlertCircle } from 'lucide-react';
 import StructureViewer3D from '../components/StructureViewer3D';
 
-const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000' : `${window.location.protocol}//${window.location.hostname}:8000`;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const INITIAL_MOCK_PREDICTIONS = {
   "NR-AhR": { "is_active": false, "probability": 0.096, "optimal_threshold": 0.85 },

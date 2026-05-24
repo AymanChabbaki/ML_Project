@@ -1,0 +1,29 @@
+# Python virtual environments & packages
+venv/
+.venv/
+env/
+ENV/
+*.pyc
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Node modules & frontend build outputs
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+
+# Heavy model files (prevent pushing to Github)
+tox21_production_models/
+models/
+*.pkl
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,51 @@
+name: Deploy FastAPI to Azure
+
+# This tells GitHub to run this script every time you push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: toxapiayman.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        run: |
+          # Notice we are using the tag ':latest' now so we don't have to manually update version numbers
+          docker build -t toxapiayman.azurecr.io/tox-backend:latest .
+          docker push toxapiayman.azurecr.io/tox-backend:latest
+
+      - name: Deploy to Azure Container Instances
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            # We use 'container create' instead of 'restart' to force Azure to pull the fresh image
+            az container create \
+              --resource-group tox-api-rg-italy \
+              --name tox-api-container \
+              --image toxapiayman.azurecr.io/tox-backend:latest \
+              --registry-username ${{ secrets.ACR_USERNAME }} \
+              --registry-password ${{ secrets.ACR_PASSWORD }} \
+              --dns-name-label tox-api-ayman \
+              --ports 7860 \
+              --os-type Linux \
+              --cpu 1 \
+              --memory 1.5 \
+              --location italynorth

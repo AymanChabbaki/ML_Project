@@ -13,6 +13,7 @@ class PredictionRequest(BaseModel):
         example=["CC(=O)OC1=CC=CC=C1C(=O)O"],
     )
 
+
 class EndpointPrediction(BaseModel):
     is_active: bool
     probability: float

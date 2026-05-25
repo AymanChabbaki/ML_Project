@@ -1,7 +1,12 @@
 import os
+import time
+from collections import defaultdict, deque
+from threading import Lock
 
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from .schemas import PredictionRequest, PredictionResponse
 from .predictor import predictor
 
@@ -20,6 +25,20 @@ ALLOWED_ORIGINS = [
     if origin.strip()
 ]
 
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1,0.0.0.0,backend,toxpredictor.techermanos.org,*.techermanos.org",
+    ).split(",")
+    if host.strip()
+]
+
+RATE_LIMIT_REQUESTS_PER_MINUTE = int(os.getenv("API_RATE_LIMIT_REQUESTS_PER_MINUTE", "120"))
+RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("API_RATE_LIMIT_WINDOW_SECONDS", "60"))
+_REQUEST_HISTORY = defaultdict(deque)
+_REQUEST_HISTORY_LOCK = Lock()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -27,6 +46,50 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=ALLOWED_HOSTS,
+)
+
+
+def _get_client_ip(request: Request) -> str:
+    forwarded_for = request.headers.get("x-forwarded-for", "").strip()
+    if forwarded_for:
+        first_ip = forwarded_for.split(",")[0].strip()
+        if first_ip:
+            return first_ip
+
+    real_ip = request.headers.get("x-real-ip", "").strip()
+    if real_ip:
+        return real_ip
+
+    if request.client and request.client.host:
+        return request.client.host
+
+    return "unknown"
+
+
+@app.middleware("http")
+async def request_rate_limiter(request: Request, call_next):
+    client_ip = _get_client_ip(request)
+    current_time = time.monotonic()
+
+    with _REQUEST_HISTORY_LOCK:
+        request_times = _REQUEST_HISTORY[client_ip]
+        cutoff = current_time - RATE_LIMIT_WINDOW_SECONDS
+        while request_times and request_times[0] <= cutoff:
+            request_times.popleft()
+
+        if len(request_times) >= RATE_LIMIT_REQUESTS_PER_MINUTE:
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Rate limit exceeded. Please slow down."},
+            )
+
+        request_times.append(current_time)
+
+    return await call_next(request)
 
 
 def _cors_response(content: str, media_type: str, request: Request) -> Response:
@@ -54,14 +117,14 @@ def predict(request: PredictionRequest):
     return response
 
 @app.get("/structure", tags=["Visualization"])
-def get_structure(smiles: str, request: Request):
+def get_structure(request: Request, smiles: str = Query(..., min_length=1, max_length=256)):
     svg_content = predictor.get_structure_svg(smiles)
     if not svg_content:
         raise HTTPException(status_code=400, detail="Invalid SMILES string or drawing error.")
     return _cors_response(svg_content, "image/svg+xml", request)
 
 @app.get("/structure3d", tags=["Visualization"])
-def get_structure_3d(smiles: str, request: Request):
+def get_structure_3d(request: Request, smiles: str = Query(..., min_length=1, max_length=256)):
     mol_block = predictor.get_structure_3d(smiles)
     if not mol_block:
         raise HTTPException(status_code=400, detail="Invalid SMILES string or embedding error.")

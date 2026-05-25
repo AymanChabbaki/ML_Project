@@ -103,6 +103,11 @@ async def request_rate_limiter(request: Request, call_next):
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
     response = await call_next(request)
+    origin = request.headers.get("origin")
+    if origin in ALLOWED_ORIGINS:
+        response.headers.setdefault("Access-Control-Allow-Origin", origin)
+        response.headers.setdefault("Access-Control-Allow-Credentials", "false")
+        response.headers.setdefault("Vary", "Origin")
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "no-referrer")

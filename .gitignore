@@ -15,7 +15,6 @@ frontend/dist-ssr/
 frontend/*.local
 
 # Heavy model files (prevent pushing to Github)
-tox21_production_models/
 *.pkl
 
 # Local environment files

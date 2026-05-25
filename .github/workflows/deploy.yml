@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-    # ONLY trigger this workflow if files inside the tox-api folder change
     paths:
       - 'tox-api/**'
 
@@ -12,7 +11,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
-    # This acts like a global 'cd tox-api' for all run commands in this job
     defaults:
       run:
         working-directory: ./tox-api
@@ -22,9 +20,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
-
-      - name: Force LFS Pull
-        run: git lfs pull
 
       - name: Log in to Azure
         uses: azure/login@v2
@@ -39,10 +34,10 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build and Push Docker Image
-        # Because of the 'defaults' above, this runs safely inside the tox-api folder
         run: |
-          docker build -t toxapiayman.azurecr.io/tox-backend:latest .
-          docker push toxapiayman.azurecr.io/tox-backend:latest
+          # Use the unique GitHub commit hash to bust the Azure Cache
+          docker build -t toxapiayman.azurecr.io/tox-backend:${{ github.sha }} .
+          docker push toxapiayman.azurecr.io/tox-backend:${{ github.sha }}
 
       - name: Deploy to Azure Container Instances
         uses: azure/cli@v2
@@ -52,7 +47,7 @@ jobs:
             az container create \
               --resource-group tox-api-rg-italy \
               --name tox-api-container \
-              --image toxapiayman.azurecr.io/tox-backend:latest \
+              --image toxapiayman.azurecr.io/tox-backend:${{ github.sha }} \
               --registry-username ${{ secrets.ACR_USERNAME }} \
               --registry-password ${{ secrets.ACR_PASSWORD }} \
               --dns-name-label tox-api-ayman \

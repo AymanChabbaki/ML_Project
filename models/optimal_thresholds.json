@@ -1,0 +1,14 @@
+{
+    "NR-AR": 0.136,
+    "NR-AR-LBD": 0.195,
+    "NR-AhR": 0.404,
+    "NR-Aromatase": 0.2,
+    "NR-ER": 0.228,
+    "NR-ER-LBD": 0.112,
+    "NR-PPAR-gamma": 0.173,
+    "SR-ARE": 0.338,
+    "SR-ATAD5": 0.182,
+    "SR-HSE": 0.213,
+    "SR-MMP": 0.369,
+    "SR-p53": 0.327
+}

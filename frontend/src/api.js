@@ -1,4 +1,14 @@
-const defaultCandidates = import.meta.env.DEV ? [""] : ["/tox"];
+function getProxyBaseOnPort(port) {
+  if (typeof window === "undefined") return "";
+  return `${window.location.protocol}//${window.location.hostname}:${port}`;
+}
+
+const defaultCandidates = import.meta.env.DEV
+  ? [""]
+  : [
+      (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, ""),
+      getProxyBaseOnPort(8010),
+    ];
 
 const rawCandidates = defaultCandidates
   .filter((base) => typeof base === "string")

@@ -10,12 +10,6 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from .schemas import PredictionRequest, PredictionResponse
 from .predictor import predictor
 
-app = FastAPI(
-    title="Tox21 Prediction API",
-    description="FastAPI backend serving the Tox21 Consensus Models.",
-    version="1.0.0"
-)
-
 ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
@@ -34,10 +28,24 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+ENABLE_API_DOCS = os.getenv("ENABLE_API_DOCS", "false").strip().lower() in {"1", "true", "yes", "on"}
+DOCS_URL = "/docs" if ENABLE_API_DOCS else None
+REDOC_URL = "/redoc" if ENABLE_API_DOCS else None
+OPENAPI_URL = "/openapi.json" if ENABLE_API_DOCS else None
+
 RATE_LIMIT_REQUESTS_PER_MINUTE = int(os.getenv("API_RATE_LIMIT_REQUESTS_PER_MINUTE", "120"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("API_RATE_LIMIT_WINDOW_SECONDS", "60"))
 _REQUEST_HISTORY = defaultdict(deque)
 _REQUEST_HISTORY_LOCK = Lock()
+
+app = FastAPI(
+    title="Tox21 Prediction API",
+    description="FastAPI backend serving the Tox21 Consensus Models.",
+    version="1.0.0",
+    docs_url=DOCS_URL,
+    redoc_url=REDOC_URL,
+    openapi_url=OPENAPI_URL,
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -92,6 +100,20 @@ async def request_rate_limiter(request: Request, call_next):
     return await call_next(request)
 
 
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    response.headers.setdefault("Permissions-Policy", "geolocation=(), camera=(), microphone=(), payment=()")
+    response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+    response.headers.setdefault("Cross-Origin-Resource-Policy", "same-site")
+    response.headers.setdefault("X-Permitted-Cross-Domain-Policies", "none")
+    response.headers.setdefault("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'")
+    return response
+
+
 def _cors_response(content: str, media_type: str, request: Request) -> Response:
     headers = {}
     origin = request.headers.get("origin")
@@ -130,6 +152,6 @@ def get_structure_3d(request: Request, smiles: str = Query(..., min_length=1, ma
         raise HTTPException(status_code=400, detail="Invalid SMILES string or embedding error.")
     return _cors_response(mol_block, "text/plain", request)
 
-# To run locally: uvicorn app.main:app --reload
+# To run locally with docs enabled: ENABLE_API_DOCS=true uvicorn app.main:app --reload
 
 

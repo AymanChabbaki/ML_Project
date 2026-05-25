@@ -19,6 +19,7 @@ ALLOWED_ORIGINS = [
     if origin.strip()
 ]
 
+
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(

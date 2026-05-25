@@ -1,8 +1,10 @@
 const configuredBase = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");
 
-const BASE_CANDIDATES = configuredBase
-  ? [configuredBase]
-  : (import.meta.env.DEV ? [""] : ["", "/tox"]);
+const DEFAULT_BASE_CANDIDATES = import.meta.env.DEV ? [""] : ["", "/tox"];
+const BASE_CANDIDATES = [configuredBase, ...DEFAULT_BASE_CANDIDATES]
+  .filter((base) => typeof base === "string")
+  .map((base) => base.trim())
+  .filter((base, index, arr) => arr.indexOf(base) === index);
 
 let activeBase = BASE_CANDIDATES[0];
 
@@ -27,10 +29,21 @@ export function apiUrl(path) {
 
 export async function apiFetch(path, options) {
   const failures = [];
+  const networkErrors = [];
 
   for (const base of BASE_CANDIDATES) {
     const url = buildApiUrl(base, path);
-    const response = await fetch(url, options);
+    let response;
+
+    try {
+      response = await fetch(url, options);
+    } catch (error) {
+      networkErrors.push({
+        url,
+        message: error?.message || "Network error",
+      });
+      continue;
+    }
 
     if (response.status !== 404) {
       activeBase = base;
@@ -38,6 +51,11 @@ export async function apiFetch(path, options) {
     }
 
     failures.push(response);
+  }
+
+  if (networkErrors.length > 0) {
+    const details = networkErrors.map((err) => `${err.url} -> ${err.message}`).join(" | ");
+    throw new Error(`All API candidates failed with network error: ${details}`);
   }
 
   return failures[0];

@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Database, Activity, Target, Code, Sliders, Cpu, ShieldCheck, ChevronDown, Terminal, CheckCircle2, FlaskConical, ExternalLink } from 'lucide-react';
 import StructureViewer3D from '../components/StructureViewer3D';
+import { API_BASE_URL } from '../api';
 
 export default function Home() {
   const navigate = useNavigate();
   const [apiTab, setApiTab] = useState('curl'); // 'curl' | 'python' | 'js'
   const [activeFaq, setActiveFaq] = useState(null);
+  const apiDocsUrl = `${API_BASE_URL || window.location.origin}/docs`;
+  const exampleApiBase = API_BASE_URL || window.location.origin;
 
   const handleQuickMolecule = (smiles) => {
     navigate('/predict', { state: { smiles } });
@@ -17,18 +20,18 @@ export default function Home() {
   };
 
   const codeTemplates = {
-    curl: `curl -X POST "http://localhost:8000/predict" \\
+    curl: `curl -X POST "${exampleApiBase}/predict" \\
      -H "Content-Type: application/json" \\
      -d '{"smiles": ["CC(=O)OC1=CC=CC=C1C(=O)O"]}'`,
     python: `import requests
 
-url = "http://localhost:8000/predict"
+url = "${exampleApiBase}/predict"
 payload = {"smiles": ["CC(=O)OC1=CC=CC=C1C(=O)O"]}
 response = requests.post(url, json=payload).json()
 
 print(response["results"][0]["predictions"])`,
     js: `const fetchPredictions = async (smiles) => {
-  const res = await fetch("http://localhost:8000/predict", {
+  const res = await fetch("${exampleApiBase}/predict", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ smiles: [smiles] })
@@ -276,7 +279,7 @@ fetchPredictions("CC(=O)OC1=CC=CC=C1C(=O)O").then(console.log);`
             </div>
           </div>
           <button 
-            onClick={() => window.open('http://localhost:8000/docs', '_blank')}
+            onClick={() => window.open(apiDocsUrl, '_blank')}
             className="text-xs font-bold text-indigo-650 flex items-center gap-1.5 hover:underline pt-2"
           >
             <span>Open Swagger Docs</span>

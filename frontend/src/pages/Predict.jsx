@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Bolt, ZoomIn, Sliders, Terminal, AlertCircle } from 'lucide-react';
 import StructureViewer3D from '../components/StructureViewer3D';
-
-const API_BASE_URL = import.meta.env.DEV
-  ? (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000')
-  : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000');
+import { apiUrl } from '../api';
 
 const INITIAL_MOCK_PREDICTIONS = {
   "NR-AhR": { "is_active": false, "probability": 0.096, "optimal_threshold": 0.85 },
@@ -61,7 +58,7 @@ export default function Predict() {
     setUsingMock(false);
 
     try {
-      const predRes = await fetch(`${API_BASE_URL}/predict`, {
+      const predRes = await fetch(apiUrl('/predict'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ smiles: [query] })
@@ -93,7 +90,7 @@ export default function Predict() {
       });
 
       // Fetch 2D SVG
-      const structRes = await fetch(`${API_BASE_URL}/structure?smiles=${encodeURIComponent(query)}`);
+      const structRes = await fetch(apiUrl(`/structure?smiles=${encodeURIComponent(query)}`));
       if (structRes.ok) {
         const svgText = await structRes.text();
         setStructureSvg(svgText);

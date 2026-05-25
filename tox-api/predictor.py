@@ -25,6 +25,8 @@ class Tox21Predictor:
             return os.path.abspath(env_models_dir)
 
         candidates = [
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "tox21_production_models")),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "models", "tox21_production_models")),
             "/app/tox21_production_models",
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "tox21_production_models")),
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tox21_production_models")),

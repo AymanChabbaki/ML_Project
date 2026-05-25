@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Zap } from 'lucide-react';
-import { apiUrl } from '../api';
+import { apiFetch } from '../api';
 
 export default function StructureViewer3D({ smiles }) {
   const containerRef = useRef(null);
@@ -20,7 +20,7 @@ export default function StructureViewer3D({ smiles }) {
 
     const fetch3D = async () => {
       try {
-        const res = await fetch(apiUrl(`/structure3d?smiles=${encodeURIComponent(smiles)}`));
+        const res = await apiFetch(`/structure3d?smiles=${encodeURIComponent(smiles)}`);
         if (!res.ok) throw new Error('Failed to load 3D mol');
         const molBlock = await res.text();
         

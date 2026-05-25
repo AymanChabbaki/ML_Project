@@ -13,9 +13,7 @@ frontend/node_modules/
 frontend/dist/
 frontend/dist-ssr/
 frontend/*.local
-
-# Heavy model files (prevent pushing to Github)
-*.pkl
+/models
 
 # Local environment files
 .env

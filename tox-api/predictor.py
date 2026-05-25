@@ -6,7 +6,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import rdFingerprintGenerator
 from typing import List
-from .schemas import PredictionResponse, MoleculePredictionResponse, EndpointPrediction
+from schemas import PredictionResponse, MoleculePredictionResponse, EndpointPrediction
 
 MORGAN_GENERATOR = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=1024)
 

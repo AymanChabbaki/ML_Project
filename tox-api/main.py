@@ -7,8 +7,8 @@ from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.trustedhost import TrustedHostMiddleware
-from .schemas import PredictionRequest, PredictionResponse
-from .predictor import predictor
+from schemas import PredictionRequest, PredictionResponse
+from predictor import predictor
 
 ALLOWED_ORIGINS = [
     origin.strip()
@@ -119,6 +119,11 @@ async def security_headers(request: Request, call_next):
     return response
 
 
+@app.get("/", tags=["Health"])
+def root_health_check():
+    return health_check()
+
+
 def _cors_response(content: str, media_type: str, request: Request) -> Response:
     headers = {}
     origin = request.headers.get("origin")
@@ -157,6 +162,6 @@ def get_structure_3d(request: Request, smiles: str = Query(..., min_length=1, ma
         raise HTTPException(status_code=400, detail="Invalid SMILES string or embedding error.")
     return _cors_response(mol_block, "text/plain", request)
 
-# To run locally with docs enabled: ENABLE_API_DOCS=true uvicorn app.main:app --reload
+# To run locally with docs enabled: ENABLE_API_DOCS=true uvicorn app:app --reload
 
 

@@ -1,3 +1,14 @@
+---
+title: Tox21 Backend API
+emoji: "🧪"
+colorFrom: blue
+colorTo: green
+sdk: docker
+sdk_version: "1.0.0"
+app_file: app.py
+pinned: false
+---
+
 # Tox21 Backend on Hugging Face Spaces
 
 This backend can run as a Hugging Face Docker Space.

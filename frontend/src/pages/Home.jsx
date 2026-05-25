@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Database, Activity, Target, Code, Sliders, Cpu, ShieldCheck, ChevronDown, Terminal, CheckCircle2, FlaskConical, ExternalLink } from 'lucide-react';
 import StructureViewer3D from '../components/StructureViewer3D';
+import { API_BASE_URL } from '../api';
 
 export default function Home() {
   const navigate = useNavigate();
   const [apiTab, setApiTab] = useState('curl'); // 'curl' | 'python' | 'js'
   const [activeFaq, setActiveFaq] = useState(null);
   const siteUrl = (import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/$/, '');
-  const apiBase = (import.meta.env.VITE_API_BASE_URL || 'https://api-tox.loca.lt').replace(/\/$/, '');
+  const apiBase = API_BASE_URL || window.location.origin;
   const apiDocsUrl = `${apiBase}/docs`;
   const exampleApiBase = apiBase;
 

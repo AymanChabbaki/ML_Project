@@ -7,7 +7,10 @@ export function apiUrl(path) {
 
 export function apiFetch(path, options) {
   const headers = new Headers(options?.headers || {});
-  headers.set("bypass-tunnel-reminder", "1");
+  
+  // This header bypasses Ngrok's warning page instantly 
+  // without triggering a CORS preflight check!
+  headers.set("ngrok-skip-browser-warning", "true");
 
   return fetch(apiUrl(path), {
     ...options,

@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # Install system dependencies (e.g. libgomp1 for xgboost and other shared libs)
 RUN apt-get update && apt-get install -y --no-install-recommends \

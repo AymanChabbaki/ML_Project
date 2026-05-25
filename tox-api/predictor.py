@@ -55,6 +55,11 @@ class Tox21Predictor:
                         self.endpoints[ep_name] = data
                     except Exception as e:
                         print(f"Failed to load {f}: {e}")
+                        import traceback
+                        with open(os.path.join(self.models_dir, "error_log.txt"), "a") as err_file:
+                            err_file.write(f"Failed to load {f}:\n")
+                            traceback.print_exc(file=err_file)
+
 
     def smiles_to_fingerprint(self, smiles: str):
         mol = Chem.MolFromSmiles(smiles)

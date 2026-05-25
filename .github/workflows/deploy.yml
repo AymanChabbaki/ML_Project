@@ -23,6 +23,9 @@ jobs:
         with:
           lfs: true
 
+      - name: Force LFS Pull
+        run: git lfs pull
+
       - name: Log in to Azure
         uses: azure/login@v2
         with:

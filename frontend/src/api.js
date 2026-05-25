@@ -1,7 +1,6 @@
-const configuredBase = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");
 const defaultCandidates = import.meta.env.DEV ? [""] : ["/tox", ""];
 
-const rawCandidates = [configuredBase, ...defaultCandidates]
+const rawCandidates = defaultCandidates
   .filter((base) => typeof base === "string")
   .map((base) => base.trim())
   .filter((base, index, arr) => arr.indexOf(base) === index);
@@ -10,7 +9,7 @@ const baseCandidates = rawCandidates;
 
 let activeBase = baseCandidates[0] || "";
 
-export const API_BASE_URL = configuredBase;
+export const API_BASE_URL = activeBase;
 
 function buildApiUrl(path, base = activeBase) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;

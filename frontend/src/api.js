@@ -53,10 +53,14 @@ export async function apiFetch(path, options) {
     failures.push(response);
   }
 
+  if (failures.length > 0) {
+    return failures[0];
+  }
+
   if (networkErrors.length > 0) {
     const details = networkErrors.map((err) => `${err.url} -> ${err.message}`).join(" | ");
     throw new Error(`All API candidates failed with network error: ${details}`);
   }
 
-  return failures[0];
+  throw new Error("All API candidates failed without a response.");
 }

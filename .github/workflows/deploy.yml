@@ -38,9 +38,6 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Verify Model File Sizes
-        run: ls -lh tox-api/tox21_production_models || ls -lh tox21_production_models
-
       - name: Build and Push Docker Image
         # Because of the 'defaults' above, this runs safely inside the tox-api folder
         run: |

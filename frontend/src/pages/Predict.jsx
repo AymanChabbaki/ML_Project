@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Bolt, ZoomIn, Sliders, Terminal, AlertCircle } from 'lucide-react';
 import StructureViewer3D from '../components/StructureViewer3D';
-import { apiFetch, getApiDebugState } from '../api';
+import { apiFetch } from '../api';
 
 const INITIAL_MOCK_PREDICTIONS = {
   "NR-AhR": { "is_active": false, "probability": 0.096, "optimal_threshold": 0.85 },
@@ -42,29 +42,8 @@ export default function Predict() {
   const [usingMock, setUsingMock] = useState(false);
   const [structureTab, setStructureTab] = useState('3d'); // '2d' | '3d'
   const [searchFilter, setSearchFilter] = useState('');
-  const [debugLogs, setDebugLogs] = useState([]);
-  const [isDebugOpen, setIsDebugOpen] = useState(false);
-
-  const pushDebug = ({ source, level, message }) => {
-    setDebugLogs((prev) => [
-      {
-        time: new Date().toISOString(),
-        source,
-        level,
-        message,
-      },
-      ...prev,
-    ].slice(0, 40));
-  };
 
   useEffect(() => {
-    const apiState = getApiDebugState();
-    pushDebug({
-      source: 'client',
-      level: 'info',
-      message: `API configuredBase=${apiState.configuredBase || '(same-origin)'} activeBase=${apiState.activeBase || '/'} candidates=${apiState.baseCandidates.join(', ')}`,
-    });
-
     // Check if SMILES was routed from homepage presets
     if (location.state?.smiles) {
       setSmilesQuery(location.state.smiles);
@@ -77,7 +56,6 @@ export default function Predict() {
   const handlePredict = async (query = smilesQuery) => {
     setIsPredicting(true);
     setUsingMock(false);
-    pushDebug({ source: 'predict', level: 'info', message: `Requesting prediction for: ${query}` });
 
     try {
       const predRes = await apiFetch('/predict', {
@@ -90,8 +68,6 @@ export default function Predict() {
         const errorBody = await predRes.text().catch(() => '');
         throw new Error(`Predict failed: HTTP ${predRes.status} ${predRes.statusText}${errorBody ? ` | ${errorBody.slice(0, 300)}` : ''}`);
       }
-
-      pushDebug({ source: 'predict', level: 'info', message: `Predict success: HTTP ${predRes.status}` });
 
       const predData = await predRes.json();
       const result = predData.results[0];
@@ -122,25 +98,16 @@ export default function Predict() {
         if (structRes.ok) {
           const svgText = await structRes.text();
           setStructureSvg(svgText);
-          pushDebug({ source: 'structure2d', level: 'info', message: `2D structure success: HTTP ${structRes.status}` });
         } else {
-          const structError = await structRes.text().catch(() => '');
-          pushDebug({
-            source: 'structure2d',
-            level: 'error',
-            message: `2D structure failed: HTTP ${structRes.status} ${structRes.statusText}${structError ? ` | ${structError.slice(0, 200)}` : ''}`,
-          });
           setStructureSvg(FALLBACK_SVG);
         }
       } catch (structureErr) {
         console.warn("Structure fetch failed, keeping prediction results:", structureErr);
-        pushDebug({ source: 'structure2d', level: 'error', message: `2D structure exception: ${structureErr.message}` });
         setStructureSvg(FALLBACK_SVG);
       }
 
     } catch (err) {
       console.warn("Backend down, running local simulation:", err);
-      pushDebug({ source: 'predict', level: 'error', message: `Prediction exception: ${err.message}` });
       setUsingMock(true);
       setPredictions(INITIAL_MOCK_PREDICTIONS);
       setStructureSvg(FALLBACK_SVG);
@@ -245,7 +212,7 @@ export default function Predict() {
                 {structureTab === '2d' ? (
                   <div className="w-full h-full flex items-center justify-center p-4 bg-slate-50/50" dangerouslySetInnerHTML={{ __html: structureSvg }} />
                 ) : (
-                  <StructureViewer3D smiles={smilesQuery} onDebug={pushDebug} />
+                  <StructureViewer3D smiles={smilesQuery} />
                 )}
               </div>
 
@@ -330,44 +297,6 @@ export default function Predict() {
             </div>
           </div>
         </div>
-
-        {/* Mobile-friendly debug logs */}
-        <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <button
-            onClick={() => setIsDebugOpen(!isDebugOpen)}
-            className="w-full px-4 sm:px-5 py-3 flex items-center justify-between text-left bg-slate-50 hover:bg-slate-100 transition-colors"
-          >
-            <span className="font-mono text-xs sm:text-sm text-slate-700 font-semibold">Connection Debug Log ({debugLogs.length})</span>
-            <span className="font-mono text-[11px] text-slate-500">{isDebugOpen ? 'Hide' : 'Show'}</span>
-          </button>
-          {isDebugOpen && (
-            <div className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-[11px] text-slate-500">Share a screenshot of this panel when reporting phone issues.</p>
-                <button
-                  onClick={() => setDebugLogs([])}
-                  className="text-[11px] font-mono text-slate-600 hover:text-slate-900 underline"
-                >
-                  Clear
-                </button>
-              </div>
-              {debugLogs.length === 0 ? (
-                <div className="text-[11px] text-slate-500 font-mono">No logs yet.</div>
-              ) : (
-                <div className="max-h-52 overflow-auto border border-slate-200 rounded bg-slate-950 text-slate-100 p-3 space-y-2">
-                  {debugLogs.map((entry, idx) => (
-                    <div key={`${entry.time}-${idx}`} className="font-mono text-[11px] leading-relaxed">
-                      <span className="text-slate-400">{new Date(entry.time).toLocaleTimeString()} </span>
-                      <span className={`${entry.level === 'error' ? 'text-red-300' : 'text-emerald-300'}`}>[{entry.level.toUpperCase()}]</span>
-                      <span className="text-indigo-300"> [{entry.source}] </span>
-                      <span className="text-slate-200">{entry.message}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </section>
 
         {/* Floating API Console Drawer */}
         <div className={`fixed bottom-0 right-0 w-full md:w-[600px] bg-slate-900 text-slate-100 border-t border-slate-800 transition-transform duration-300 z-[60] shadow-2xl overflow-hidden rounded-t-xl ${

@@ -1,17 +1,14 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");
+// Default to the new /api proxy path we just set up in vercel.json
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "/api").trim().replace(/\/$/, "");
 
 export function apiUrl(path) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  if (!API_BASE_URL) {
-    return normalizedPath;
-  }
-
   return `${API_BASE_URL}${normalizedPath}`;
 }
 
 export function apiFetch(path, options) {
+  // We deleted the bypass-tunnel-reminder header because your API is real now!
   const headers = new Headers(options?.headers || {});
-  headers.set("bypass-tunnel-reminder", "1");
 
   return fetch(apiUrl(path), {
     ...options,

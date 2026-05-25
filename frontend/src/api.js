@@ -6,5 +6,11 @@ export function apiUrl(path) {
 }
 
 export function apiFetch(path, options) {
-  return fetch(apiUrl(path), options);
+  const headers = new Headers(options?.headers || {});
+  headers.set("bypass-tunnel-reminder", "1");
+
+  return fetch(apiUrl(path), {
+    ...options,
+    headers,
+  });
 }

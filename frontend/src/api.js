@@ -1,57 +1,10 @@
-const configuredBase = (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/$/, "");
-const defaultCandidates = import.meta.env.DEV ? [""] : [configuredBase];
-
-const rawCandidates = defaultCandidates
-  .filter((base) => typeof base === "string")
-  .map((base) => base.trim())
-  .filter((base) => base.length > 0)
-  .filter((base, index, arr) => arr.indexOf(base) === index);
-
-const baseCandidates = rawCandidates;
-
-let activeBase = baseCandidates[0] || "";
-
-export const API_BASE_URL = activeBase;
-
-function buildApiUrl(path, base = activeBase) {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  return `${base}${normalizedPath}`;
-}
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://api-tox.loca.lt").trim().replace(/\/$/, "");
 
 export function apiUrl(path) {
-  return buildApiUrl(path);
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${API_BASE_URL}${normalizedPath}`;
 }
 
-export async function apiFetch(path, options) {
-  const responses = [];
-  const networkErrors = [];
-  const retryableStatus = new Set([404, 405, 502, 503, 504]);
-
-  for (const base of baseCandidates) {
-    try {
-      const response = await fetch(buildApiUrl(path, base), options);
-
-      if (response.ok) {
-        activeBase = base;
-        return response;
-      }
-
-      // Retry another base only for likely routing/proxy misses.
-      if (retryableStatus.has(response.status)) {
-        responses.push(response);
-        continue;
-      }
-
-      activeBase = base;
-      return response;
-    } catch (error) {
-      networkErrors.push(error?.message || "Network error");
-    }
-  }
-
-  if (responses.length > 0) {
-    return responses[0];
-  }
-
-  throw new Error(networkErrors.join(" | ") || "API request failed.");
+export function apiFetch(path, options) {
+  return fetch(apiUrl(path), options);
 }

@@ -2,13 +2,22 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Zap } from 'lucide-react';
 import { apiFetch } from '../api';
 
-export default function StructureViewer3D({ smiles }) {
+export default function StructureViewer3D({ smiles, onDebug }) {
   const containerRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!smiles || !window.$3Dmol) return;
+    if (!smiles) return;
+
+    if (!window.$3Dmol) {
+      onDebug?.({
+        source: 'structure3d',
+        level: 'error',
+        message: '3D viewer library not loaded (window.$3Dmol is missing).',
+      });
+      return;
+    }
 
     let active = true;
     setLoading(true);
@@ -21,7 +30,10 @@ export default function StructureViewer3D({ smiles }) {
     const fetch3D = async () => {
       try {
         const res = await apiFetch(`/structure3d?smiles=${encodeURIComponent(smiles)}`);
-        if (!res.ok) throw new Error('Failed to load 3D mol');
+        if (!res.ok) {
+          const errorBody = await res.text().catch(() => '');
+          throw new Error(`HTTP ${res.status} ${res.statusText}${errorBody ? ` | ${errorBody.slice(0, 200)}` : ''}`);
+        }
         const molBlock = await res.text();
         
         if (!active) return;
@@ -43,10 +55,21 @@ export default function StructureViewer3D({ smiles }) {
         viewer.zoomTo();
         viewer.render();
         viewer.spin('vy', 1);
+
+        onDebug?.({
+          source: 'structure3d',
+          level: 'info',
+          message: '3D structure loaded successfully.',
+        });
         
         setLoading(false);
       } catch (err) {
         console.warn("Failed fetching 3D structures, using chemical simulation:", err);
+        onDebug?.({
+          source: 'structure3d',
+          level: 'error',
+          message: `3D fetch failed: ${err.message}`,
+        });
         if (active) {
           setError(true);
           setLoading(false);
@@ -111,7 +134,7 @@ M  END
     return () => {
       active = false;
     };
-  }, [smiles]);
+  }, [smiles, onDebug]);
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden bg-white border border-slate-200 min-h-[300px] shadow-sm">

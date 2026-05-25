@@ -8,6 +8,14 @@ let activeBase = BASE_CANDIDATES[0];
 
 export const API_BASE_URL = activeBase;
 
+export function getApiDebugState() {
+  return {
+    configuredBase,
+    activeBase,
+    baseCandidates: [...BASE_CANDIDATES],
+  };
+}
+
 function buildApiUrl(base, path) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${base}${normalizedPath}`;

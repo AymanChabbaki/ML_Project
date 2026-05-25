@@ -1,14 +1,22 @@
 name: Deploy FastAPI to Azure
 
-# This tells GitHub to run this script every time you push to the 'main' branch
 on:
   push:
     branches:
       - main
+    # ONLY trigger this workflow if files inside the tox-api folder change
+    paths:
+      - 'tox-api/**'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    
+    # This acts like a global 'cd tox-api' for all run commands in this job
+    defaults:
+      run:
+        working-directory: ./tox-api
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -26,8 +34,8 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build and Push Docker Image
+        # Because of the 'defaults' above, this runs safely inside the tox-api folder
         run: |
-          # Notice we are using the tag ':latest' now so we don't have to manually update version numbers
           docker build -t toxapiayman.azurecr.io/tox-backend:latest .
           docker push toxapiayman.azurecr.io/tox-backend:latest
 
@@ -36,7 +44,6 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            # We use 'container create' instead of 'restart' to force Azure to pull the fresh image
             az container create \
               --resource-group tox-api-rg-italy \
               --name tox-api-container \

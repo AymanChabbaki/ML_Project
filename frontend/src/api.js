@@ -1,4 +1,4 @@
-const defaultCandidates = import.meta.env.DEV ? [""] : ["/tox", ""];
+const defaultCandidates = import.meta.env.DEV ? [""] : ["/tox"];
 
 const rawCandidates = defaultCandidates
   .filter((base) => typeof base === "string")

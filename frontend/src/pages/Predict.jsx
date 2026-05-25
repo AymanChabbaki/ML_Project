@@ -89,12 +89,17 @@ export default function Predict() {
         }
       });
 
-      // Fetch 2D SVG
-      const structRes = await apiFetch(`/structure?smiles=${encodeURIComponent(query)}`);
-      if (structRes.ok) {
-        const svgText = await structRes.text();
-        setStructureSvg(svgText);
-      } else {
+      // Keep predictive results even if optional structure rendering fails.
+      try {
+        const structRes = await apiFetch(`/structure?smiles=${encodeURIComponent(query)}`);
+        if (structRes.ok) {
+          const svgText = await structRes.text();
+          setStructureSvg(svgText);
+        } else {
+          setStructureSvg(FALLBACK_SVG);
+        }
+      } catch (structureErr) {
+        console.warn("Structure fetch failed, keeping prediction results:", structureErr);
         setStructureSvg(FALLBACK_SVG);
       }
 

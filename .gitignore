@@ -19,7 +19,8 @@ frontend/*.local
 .env
 .env.local
 .env.*.local
-
+codeSource(Repo Link).txt
+rapport.pdf
 # OS files
 .DS_Store
 Thumbs.db
